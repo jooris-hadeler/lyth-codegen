@@ -179,7 +179,7 @@ impl Assembler {
             Operand::Register(dst_reg) => match src {
                 // add dst, src
                 Operand::Register(src_reg) => {
-                    self.emit_rex_prefix(src_reg, dst_reg);
+                    self.emit_rex_prefix(dst_reg, src_reg);
 
                     self.emit8(0x01);
 
@@ -203,7 +203,7 @@ impl Assembler {
 
                 // add dst, imm32
                 Operand::Imm32(imm32) => {
-                    self.emit_rex_prefix(0, dst_reg);
+                    self.emit_rex_prefix(dst_reg, 0);
 
                     self.emit8(0x81);
 
@@ -232,7 +232,7 @@ impl Assembler {
             Operand::Register(dst_reg) => match src {
                 // sub dst, src
                 Operand::Register(src_reg) => {
-                    self.emit_rex_prefix(src_reg, dst_reg);
+                    self.emit_rex_prefix(dst_reg, src_reg);
 
                     self.emit8(0x29);
 
@@ -256,7 +256,7 @@ impl Assembler {
 
                 // sub dst, imm32
                 Operand::Imm32(imm32) => {
-                    self.emit_rex_prefix(0, dst_reg);
+                    self.emit_rex_prefix(dst_reg, 0);
 
                     self.emit8(0x81);
 

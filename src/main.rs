@@ -8,7 +8,7 @@ use crate::assembler::Assembler;
 fn main() {
     let mut asm = Assembler::new();
 
-    asm.enter(0);
+    // asm.enter(0);
     // asm.leave();
     // asm.ret();
 
@@ -37,19 +37,19 @@ fn main() {
     // asm.pop(Registers::Rax);
     // asm.pop(Registers::R9);
 
-    // asm.sub(Registers::Rax, Registers::Rcx);
-    // asm.sub(Registers::R8, Registers::Rcx);
-    //
-    // asm.sub(Registers::Rax, Registers::R8);
-    // asm.sub(Registers::R9, Registers::R8);
-    //
-    // asm.sub(Registers::Rax, 0xbeefu32);
-    // asm.sub(Registers::Rax, Operand::memory_and_offset(Registers::Rax, 0xbeefu32));
-    // asm.sub(Registers::Rax, Operand::memory_and_offset(Registers::R8, 0xbeefu32));
-    //
-    // asm.sub(Registers::R9, 0xbeefu32);
-    // asm.sub(Registers::R11, Operand::memory_and_offset(Registers::Rax, 0xbeefu32));
-    // asm.sub(Registers::R11, Operand::memory_and_offset(Registers::R8, 0xbeefu32));
+    asm.add(Registers::Rax, Registers::Rcx);
+    asm.add(Registers::R8, Registers::Rcx);
+
+    asm.add(Registers::Rax, Registers::R8);
+    asm.add(Registers::R9, Registers::R8);
+
+    asm.add(Registers::Rax, 0xbeefu32);
+    asm.add(Registers::Rax, Operand::memory_and_offset(Registers::Rax, 0xbeefu32));
+    asm.add(Registers::Rax, Operand::memory_and_offset(Registers::R8, 0xbeefu32));
+
+    asm.add(Registers::R9, 0xbeefu32);
+    asm.add(Registers::R11, Operand::memory_and_offset(Registers::Rax, 0xbeefu32));
+    asm.add(Registers::R11, Operand::memory_and_offset(Registers::R8, 0xbeefu32));
 
     let code = asm.finalize();
 
