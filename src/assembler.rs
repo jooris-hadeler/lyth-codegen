@@ -25,6 +25,10 @@ pub enum Registers {
     R9,
     R10,
     R11,
+    R12,
+    R13,
+    R14,
+    R15,
 }
 
 /// This trait is used to convert a `Registers` enum to a `RegisterId`.
@@ -300,6 +304,29 @@ impl Assembler {
         }
     }
 
+    /// This function is used to emit a enter instruction.
+    /// In this case we just do what enter does manually, that way
+    /// we have more control over the alignment of the stack.
+    ///
+    /// Params:
+    /// - `stack_size`: the stack size, this will be aligned to 16 bytes
+    pub fn enter(&mut self, stack_size: u32) {
+        self.push(Registers::Rbp);
+        self.mov(Registers::Rbp, Registers::Rsp);
+
+        if stack_size > 0 {
+            // align stack_size to 16 bytes
+            let stack_size = (stack_size + 15) & !15;
+
+            self.sub(Registers::Rsp, stack_size);
+        }
+    }
+
+    /// This function is used to emit a leave instruction.
+    pub fn leave(&mut self) {
+        self.emit8(0xC9);
+    }
+
     /// This function is used to patch a jump instruction.
     ///
     /// Params:
@@ -326,7 +353,7 @@ impl Assembler {
     pub fn push<S: Into<Operand>>(&mut self, src: S) {
         match src.into() {
             Operand::Register(reg) => {
-                self.emit_rex_prefix(0, reg);
+                self.emit_rex_prefix(reg, 0);
 
                 self.emit8(0x50 | (reg & 0x7));
             }
@@ -352,7 +379,7 @@ impl Assembler {
 
         match dst {
             Operand::Register(reg) => {
-                self.emit_rex_prefix(0, reg);
+                self.emit_rex_prefix(reg, 0);
 
                 self.emit8(0x58 | (reg & 0x7));
             }
