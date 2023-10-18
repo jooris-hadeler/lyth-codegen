@@ -272,6 +272,72 @@ impl Assembler {
         }
     }
 
+    /// This function generates a xor instruction that xors the destination with the source.
+    ///
+    /// Params:
+    /// - `dst`: the destination operand
+    /// - `src`: the source operand
+    pub fn xor<A: Into<Operand>, B: Into<Operand>>(&mut self, dst: A, src: B) {
+        let dst = dst.into();
+        let src = src.into();
+
+        match dst {
+            Operand::Register(dst_reg) => match src {
+                Operand::Register(src_reg) => {
+                    self.emit_rex_prefix(dst_reg, src_reg);
+
+                    self.emit8(0x31);
+
+                    self.emit8(0xC0
+                        | ((dst_reg & 0x7) << 3)
+                        | (src_reg & 0x7));
+                }
+
+                Operand::MemoryAndOffset(src_reg, src_offset) => {
+                    self.emit_rex_prefix(src_reg, dst_reg);
+
+                    self.emit8(0x33);
+
+                    self.emit8(0x80
+                        | ((dst_reg & 0x7) << 3)
+                        | (src_reg & 0x7));
+
+                    self.emit32(src_offset);
+                }
+
+                Operand::Imm32(imm32) => {
+                    self.emit_rex_prefix(dst_reg, 0);
+
+                    self.emit8(0x81);
+
+                    self.emit8(0xF0 | (dst_reg & 0x7));
+
+                    self.emit32(imm32);
+                }
+
+                op => panic!("Invalid source: {:?}", op)
+            }
+
+            Operand::MemoryAndOffset(dst_reg, dst_offset) => match src {
+                Operand::Register(src_reg) => {
+                    self.emit_rex_prefix(dst_reg, src_reg);
+
+                    self.emit8(0x31);
+
+                    self.emit8(0x80
+                        | ((src_reg & 0x7) << 3)
+                        | (dst_reg & 0x7));
+
+                    self.emit32(dst_offset);
+                }
+
+                op => panic!("Invalid source: {:?}", op)
+            }
+
+            op => panic!("Invalid destination: {:?}", op)
+        }
+    }
+
     /// This function generates a near jump instruction and returns the offset to the jump destination.
     ///
     /// Params:
